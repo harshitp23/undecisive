@@ -36,15 +36,6 @@ html[data-theme="ink"]{
   --acc-line:color-mix(in oklab, var(--acc) 40%, transparent);
   --on-acc:#16151C;
 }
-html[data-theme="paper"]{
-  --bg:#F6F4EF; --bg-2:#EDEAE2; --surf:#FFFFFF; --surf-2:#F3F0EA;
-  --line:rgba(28,25,40,.10); --line-2:rgba(28,25,40,.2);
-  --tx:#1B1826; --tx-2:#5E5970; --tx-3:#918CA3;
-  --shadow:0 1px 2px rgba(28,25,40,.05), 0 10px 24px -20px rgba(28,25,40,.5);
-  --acc-soft:color-mix(in oklab, var(--acc) 18%, transparent);
-  --acc-line:color-mix(in oklab, var(--acc) 55%, transparent);
-  --on-acc:#16151C;
-}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -464,7 +455,7 @@ const ic = (n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stro
 
 /* ---------- sections ---------- */
 const SECTIONS = [
-  {id:'buy',   label:'Buy',   icon:'bag',  hue:38,  acc:'#FFB03A', title:'Things to<br><span>buy</span>',        eyebrow:'Shopping list', sub:'Stuff you keep meaning to order, split by country and store.', spin:'Pick a thing to buy'},
+  {id:'buy',   label:'Buy',   icon:'bag',  hue:38,  acc:'#FFB03A', wheel:false, title:'Things to<br><span>buy</span>',        eyebrow:'Shopping list', sub:'Stuff you keep meaning to order, split by country and store.', spin:''},
   {id:'eat',   label:'Eat',   icon:'fork', hue:345, acc:'#FF5C7A', title:'Places to<br><span>eat</span>',        eyebrow:'Restaurants',   sub:'Where to go, what to order, and the dishes worth repeating.', spin:'Pick a place'},
   {id:'cook',  label:'Cook',  icon:'pot',  hue:172, acc:'#4ECDC4', title:'Things to<br><span>cook</span>',       eyebrow:'Recipe book',   sub:'Your own recipes, written the way you actually cook them.', spin:'Pick a recipe'},
   {id:'watch', label:'Watch', icon:'play', hue:262, acc:'#A78BFA', title:'Things to<br><span>watch</span>',      eyebrow:'Watchlist',     sub:'Everything saved across streaming, in one list.', spin:'Pick something to watch'}
@@ -475,20 +466,20 @@ const SEC = Object.fromEntries(SECTIONS.map(s=>[s.id,s]));
 const seed = ()=>({
   v:1,
   buy:{countries:[
-    {id:uid(),name:'India',code:'IN',stores:[
-      {id:uid(),name:'Amazon.in',url:'https://amazon.in',items:[]},
-      {id:uid(),name:'Flipkart',url:'https://flipkart.com',items:[]},
-      {id:uid(),name:'Blinkit',url:'https://blinkit.com',items:[]}
-    ]},
     {id:uid(),name:'United States',code:'US',stores:[
       {id:uid(),name:'Amazon',url:'https://amazon.com',items:[]},
       {id:uid(),name:'Target',url:'https://target.com',items:[]},
       {id:uid(),name:'Walmart',url:'https://walmart.com',items:[]}
+    ]},
+    {id:uid(),name:'India',code:'IN',stores:[
+      {id:uid(),name:'Amazon.in',url:'https://amazon.in',items:[]},
+      {id:uid(),name:'Flipkart',url:'https://flipkart.com',items:[]},
+      {id:uid(),name:'Blinkit',url:'https://blinkit.com',items:[]}
     ]}
   ]},
   eat:{countries:[
-    {id:uid(),name:'India',code:'IN',places:[]},
-    {id:uid(),name:'United States',code:'US',places:[]}
+    {id:uid(),name:'United States',code:'US',places:[]},
+    {id:uid(),name:'India',code:'IN',places:[]}
   ]},
   cook:{recipes:[]},
   watch:{platforms:[
@@ -502,9 +493,12 @@ const seed = ()=>({
 /* ---------- storage ---------- */
 const KEY = 'pickone.v1';
 let DB = seed();
+const usFirst = list => Array.isArray(list) && list.sort((a,b)=>(b.code==='US')-(a.code==='US'));
+function normalizeDB(){ try{ usFirst(DB.buy.countries); usFirst(DB.eat.countries); }catch(e){} }
 function load(){
   try{ const raw = localStorage.getItem(KEY); if(raw){ DB = Object.assign(seed(), JSON.parse(raw)); } }
   catch(e){ console.warn('Storage unavailable — running in memory only.'); }
+  normalizeDB();
 }
 function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
 let saveTimer;
@@ -559,7 +553,6 @@ function renderNav(){
   rail.insertAdjacentHTML('beforeend', railBtns);
   if(!foot){
     rail.insertAdjacentHTML('beforeend', `<div class="rail-foot">
-      <button class="icon-btn" data-act="theme" title="Switch theme">${ic('sun')}</button>
       <button class="icon-btn" data-act="settings" title="Sync, backup and settings">${ic('cog')}<span class="sdot"></span></button>
     </div>`);
   } else rail.appendChild(foot);
@@ -575,6 +568,7 @@ function renderNav(){
 
 function renderHeader(){
   const s = SEC[state.sec];
+  $('#spinBtn').style.display = s.wheel===false ? 'none' : '';
   document.documentElement.style.setProperty('--acc', s.acc);
   document.documentElement.style.setProperty('--acc-h', s.hue);
   $('#eyebrow').textContent = s.eyebrow;
@@ -842,10 +836,6 @@ function editRecipe(r){
    ========================================================================= */
 const W = {items:[], out:new Set(), angle:0, busy:false, src:0, sub:null};
 function poolFor(srcIdx){
-  if(state.sec==='buy'){
-    const c = DB.buy.countries[srcIdx]; if(!c) return {label:'',items:[]};
-    return {label:c.name, items:c.stores.flatMap(s=>s.items.filter(i=>!i.done).map(i=>({id:i.id,name:i.name,where:s.name,url:i.url})))};
-  }
   if(state.sec==='eat'){
     const c = DB.eat.countries[srcIdx]; if(!c) return {label:'',items:[]};
     return {label:c.name, items:(c.places||[]).map(p=>({id:p.id,name:p.name,where:p.mode==='order'?'Order in':'Dine in',url:p.url,dishes:p.dishes||[]}))};
@@ -858,7 +848,6 @@ function poolFor(srcIdx){
   return {label:p.name, items:(p.titles||[]).filter(t=>!t.done).map(t=>({id:t.id,name:t.name,where:p.name,url:t.url}))};
 }
 function wheelSources(){
-  if(state.sec==='buy')  return DB.buy.countries.map(c=>c.name);
   if(state.sec==='eat')  return DB.eat.countries.map(c=>c.name);
   if(state.sec==='watch' && DB.watch.platforms.length>1) return ['Everything', ...DB.watch.platforms.map(p=>p.name)];
   return [];
@@ -979,7 +968,7 @@ function spin(){
     });
   }, reduce?320:4450);
 }
-function openWheel(){ W.out.clear(); W.angle=0; W.src=0; renderWheel(); $('#wheelDlg').showModal(); }
+function openWheel(){ if(SEC[state.sec].wheel===false) return; W.out.clear(); W.angle=0; W.src=0; renderWheel(); $('#wheelDlg').showModal(); }
 
 /* =========================================================================
    SETTINGS / BACKUP
@@ -999,8 +988,6 @@ function openSettings(){
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px">
       ${SECTIONS.map(s=>`<span class="pill" style="--acc:${s.acc};background:color-mix(in oklab,${s.acc} 16%,transparent);color:${s.acc}">${counts[s.id]} ${s.label.toLowerCase()}</span>`).join('')}
     </div>
-    <div class="field"><label>Look</label>
-      <button class="btn wide" data-theme-toggle>${ic('sun')} Switch to ${document.documentElement.dataset.theme==='ink'?'paper (light)':'ink (dark)'}</button></div>
     <div class="field"><label>Sync across devices</label><div id="syncBlock"></div></div>
     <div class="field"><label>Backup</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1014,7 +1001,6 @@ function openSettings(){
       <button class="btn ghost danger wide" data-reset>${ic('trash')} Erase everything</button></div>`;
   paintSyncBlock();
   sheet.querySelector('[data-close]').onclick = ()=>dlg.close();
-  sheet.querySelector('[data-theme-toggle]').onclick = ()=>{ toggleTheme(); dlg.close(); };
   sheet.querySelector('[data-export]').onclick = ()=>{
     const blob = new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
     const a = document.createElement('a');
@@ -1026,7 +1012,7 @@ function openSettings(){
   sheet.querySelector('#importFile').onchange = e=>{
     const f = e.target.files[0]; if(!f) return;
     const r = new FileReader();
-    r.onload = ()=>{ try{ DB = Object.assign(seed(), JSON.parse(r.result)); save(); render(); dlg.close(); toast('Backup loaded'); }
+    r.onload = ()=>{ try{ DB = Object.assign(seed(), JSON.parse(r.result)); normalizeDB(); save(); render(); dlg.close(); toast('Backup loaded'); }
                      catch(err){ toast('That file is not a Pick One backup'); } };
     r.readAsText(f);
   };
@@ -1035,12 +1021,6 @@ function openSettings(){
     toast('Everything erased', ()=>{ DB = old; });
   };
   dlg.showModal();
-}
-function toggleTheme(){
-  const el = document.documentElement;
-  el.dataset.theme = el.dataset.theme==='ink' ? 'paper' : 'ink';
-  try{ localStorage.setItem('pickone.theme', el.dataset.theme); }catch(e){}
-  $('meta[name=theme-color]').content = el.dataset.theme==='ink' ? '#16151C' : '#F6F4EF';
 }
 
 
@@ -1107,7 +1087,7 @@ async function syncPull(quiet){
   try{
     const remote = await readGist(SYNC.gist);
     if(remote && (remote.updated||0) > (DB.updated||0)){
-      DB = Object.assign(seed(), remote); persist(); render();
+      DB = Object.assign(seed(), remote); normalizeDB(); persist(); render();
       if(!quiet) toast('Updated from your other device');
     } else if(remote && (DB.updated||0) > (remote.updated||0)){
       pushAfter = true;
@@ -1129,7 +1109,7 @@ async function syncConnect(token){
       const remote = await readGist(found.id);
       const rc = countAll(remote||{}), lc = countAll(DB);
       if(rc && lc && JSON.stringify(remote)!==JSON.stringify(DB)) handoff = ()=>askMerge(remote, rc, lc);
-      else if(remote && rc >= lc){ DB = Object.assign(seed(), remote); persist(); render(); }
+      else if(remote && rc >= lc){ DB = Object.assign(seed(), remote); normalizeDB(); persist(); render(); }
       else handoff = 'push';
     } else {
       const made = await gh('/gists', {method:'POST', body: JSON.stringify({
@@ -1156,7 +1136,7 @@ function askMerge(remote, rc, lc){
     <p class="hint" style="margin-top:16px">Not sure? Cancel, download a backup first, then come back.</p>
     <div class="sheet-foot"><button class="btn ghost" data-cancel>Cancel</button></div>`;
   sheet.querySelector('[data-keep-local]').onclick = async ()=>{ DB.updated = Date.now(); persist(); await syncPush(); openSettings(); toast('This device is now the master copy'); };
-  sheet.querySelector('[data-keep-remote]').onclick = ()=>{ DB = Object.assign(seed(), remote); persist(); render(); setSync('ok'); openSettings(); toast('Synced copy loaded'); };
+  sheet.querySelector('[data-keep-remote]').onclick = ()=>{ DB = Object.assign(seed(), remote); normalizeDB(); persist(); render(); setSync('ok'); openSettings(); toast('Synced copy loaded'); };
   sheet.querySelector('[data-cancel]').onclick = ()=>{ SYNC.token=''; SYNC.gist=''; setSync('off'); dlg.close(); };
   if(!dlg.open) dlg.showModal();
 }
@@ -1232,7 +1212,6 @@ document.addEventListener('click', e=>{
   const L = () => locate(el);
 
   switch(act){
-    case 'theme': toggleTheme(); break;
     case 'settings': openSettings(); break;
 
     case 'toggle': {
@@ -1310,7 +1289,7 @@ document.addEventListener('click', e=>{
 });
 
 document.addEventListener('keydown', e=>{
-  const qa = e.target.closest('[data-qadd]');
+  const qa = e.target && e.target.closest ? e.target.closest('[data-qadd]') : null;
   if(qa && e.key==='Enter'){ e.preventDefault(); quickAdd(qa, qa.dataset.qadd); }
 });
 
@@ -1324,7 +1303,7 @@ document.addEventListener('input', e=>{
 $('#spinBtn').addEventListener('click', openWheel);
 
 document.addEventListener('keydown', e=>{
-  if(e.target.matches('input,textarea,select')) return;
+  if(!e.target || !e.target.matches || e.target.matches('input,textarea,select')) return;
   if($$('dialog').some(d=>d.open)) return;
   const i = ['1','2','3','4'].indexOf(e.key);
   if(i>-1){ state.sec = SECTIONS[i].id; location.hash=state.sec; state.q=''; render(); }
@@ -1335,7 +1314,7 @@ window.addEventListener('hashchange', ()=>{ const h=location.hash.slice(1); if(S
 $$('dialog').forEach(d=>d.addEventListener('click', e=>{ if(e.target===d) d.close(); }));
 
 /* ---------- boot ---------- */
-try{ const t = localStorage.getItem('pickone.theme'); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+try{ localStorage.removeItem('pickone.theme'); }catch(e){}
 document.body.dataset.sync = SYNC.status;
 render();
 if(SYNC.token && SYNC.gist) syncPull(true);
