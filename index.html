@@ -184,6 +184,7 @@ h1 span{color:var(--acc)}
 .mini:hover{background:var(--bg-2);color:var(--tx)}
 .mini svg{width:16px;height:16px;stroke-width:1.9}
 .mini.link:hover{color:var(--acc)}
+.mini.logbtn:hover{color:#4ADE80}
 
 /* ---------- quick add ---------- */
 .qadd{display:flex;gap:8px;align-items:center;padding:8px 8px 4px}
@@ -340,9 +341,10 @@ dialog::backdrop{background:color-mix(in oklab,var(--bg-2) 78%,transparent);back
   background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(16px);
   border-top:1px solid var(--line)
 }
-.tab{flex:1;display:grid;justify-items:center;gap:4px;padding:8px 2px;border-radius:14px;color:var(--tx-3)}
-.tab svg{width:22px;height:22px;stroke-width:1.8}
-.tab b{font:600 10px/1 var(--font-b);letter-spacing:.03em}
+.tab{flex:1;min-width:0;display:grid;justify-items:center;gap:4px;padding:8px 1px;border-radius:14px;color:var(--tx-3)}
+.tab svg{width:21px;height:21px;stroke-width:1.8}
+.tab b{font:600 9.5px/1 var(--font-b);letter-spacing:.01em}
+@media (max-width:360px){ .tab b{font-size:9px} .tab svg{width:20px;height:20px} }
 .tab[aria-current="true"]{color:var(--sec)}
 .tab[aria-current="true"] svg{transform:translateY(-1px)}
 
@@ -374,6 +376,63 @@ body[data-sync="err"] .sdot{background:#FF6B6B}
 .sync-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;
   background:var(--bg-2);border:1px solid var(--line);font-size:13.5px;margin-bottom:10px}
 .sync-row .sdot{position:static;border:0;display:block}
+.sec-lbl .mult-seg{display:inline-flex;gap:2px;margin-left:auto;background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.sec-lbl{align-items:center}
+.mult-seg button{font:700 12px/1 var(--font-m);padding:6px 9px;border-radius:999px;color:var(--tx-3);transition:.14s var(--ease)}
+.mult-seg button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc)}
+.cookmode-link{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--font-b);
+  color:var(--acc);padding:6px 10px;border-radius:999px;border:1px solid var(--acc-line)}
+.cookmode-link:hover{background:var(--acc-soft)}
+.cookmode-link svg{width:14px;height:14px;stroke-width:2}
+
+/* cooking mode */
+#cookDlg{max-width:100vw;max-height:100dvh}
+#cookDlg::backdrop{background:var(--bg)}
+.cook-sheet{width:100vw;height:100dvh;background:var(--bg);display:flex;flex-direction:column;
+  padding:0;animation:none;border:0;border-radius:0;overflow:hidden}
+.cook-top{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
+  border-bottom:1px solid var(--line);background:var(--bg-2)}
+.cook-title{font-family:var(--font-d);font-weight:800;font-size:20px;letter-spacing:-.01em;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cook-top .mini{width:40px;height:40px}.cook-top .mini svg{width:20px;height:20px}
+.cook-scroll{flex:1;overflow:auto;padding:22px 20px 40px;max-width:760px;margin:0 auto;width:100%}
+.cook-h{font:700 12px/1 var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--acc);
+  margin:8px 0 14px;display:flex;gap:8px}
+.cook-h span{color:var(--tx-3)}
+.cook-ings{list-style:none;padding:0;margin:0 0 30px}
+.cook-ings li{font-size:20px;line-height:1.5;padding:9px 0;border-bottom:1px solid var(--line)}
+.cook-steps{list-style:none;counter-reset:cs;padding:0;margin:0}
+.cook-steps li{counter-increment:cs;margin-bottom:12px}
+.cook-steps .cs{display:flex;gap:16px;width:100%;text-align:left;padding:16px 16px;border-radius:16px;
+  background:var(--surf);border:1px solid var(--line);transition:.15s var(--ease)}
+.cook-steps .cs::before{content:counter(cs);font:800 20px/1 var(--font-d);color:var(--acc);flex:none;
+  width:34px;height:34px;display:grid;place-items:center;background:var(--acc-soft);border-radius:11px}
+.cook-steps .cs .txt{font-size:20px;line-height:1.55;padding-top:3px}
+.cook-steps .cs[aria-pressed="true"]{opacity:.4}
+.cook-steps .cs[aria-pressed="true"] .txt{text-decoration:line-through}
+.cook-foot{padding:10px 18px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);
+  text-align:center;background:var(--bg-2)}
+.wake-note{font:500 11.5px/1 var(--font-m);color:var(--tx-3);letter-spacing:.04em}
+@media (max-width:520px){
+  .cook-ings li{font-size:18px}.cook-steps .cs .txt{font-size:18px}
+}
+.logday{display:flex;align-items:center;gap:12px;margin:22px 0 6px}
+.logday span:first-child{font:700 11px/1 var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
+.logday .rule{flex:1;height:1px;background:var(--line)}
+.logrow{display:flex;align-items:center;gap:12px;padding:11px 8px;border-radius:var(--r-sm);transition:background .15s var(--ease)}
+.logrow+.logrow{box-shadow:0 -1px 0 var(--line)}
+.logrow:hover{background:var(--surf-2)}
+.logic{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+  background:color-mix(in oklab,var(--sec) 16%,transparent);color:var(--sec)}
+.logic svg{width:17px;height:17px;stroke-width:1.9}
+.logmain{flex:1;min-width:0}
+.logname{display:block;font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logmeta{display:block;font-size:12.5px;color:var(--tx-3)}
+.logtime{font:500 12px/1 var(--font-m);color:var(--tx-3);flex:none;display:flex;align-items:center;gap:6px}
+.wtag{display:inline-grid;place-items:center;color:var(--acc)}
+.wtag svg{width:13px;height:13px;stroke-width:2}
+.logrow .mini{opacity:.4}
+.logrow:hover .mini{opacity:1}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
@@ -417,6 +476,7 @@ body[data-sync="err"] .sdot{background:#FF6B6B}
 <dialog id="readDlg"><div class="sheet wide reader" id="readSheet"></div></dialog>
 <dialog id="wheelDlg"><div class="sheet wheel-sheet" id="wheelSheet"></div></dialog>
 <dialog id="setDlg"><div class="sheet" id="setSheet"></div></dialog>
+<dialog id="cookDlg"><div class="cook-sheet" id="cookSheet"></div></dialog>
 <script>
 /* =========================================================================
    PICK ONE — a personal hub for buying, eating, cooking, watching.
@@ -430,6 +490,31 @@ const uid = ()=>Math.random().toString(36).slice(2,9);
 const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm = s=>String(s??'').toLowerCase().trim();
 const safeUrl = u => { u=String(u||'').trim(); if(!u) return ''; return /^https?:\/\//i.test(u) ? u : 'https://'+u; };
+
+/* ---------- ingredient scaling ---------- */
+const VULGAR={"\u00bd":.5,"\u2153":1/3,"\u2154":2/3,"\u00bc":.25,"\u00be":.75,"\u2155":.2,"\u2156":.4,"\u2157":.6,"\u2158":.8,"\u2159":1/6,"\u215a":5/6,"\u215b":.125,"\u215c":.375,"\u215d":.625,"\u215e":.875};
+const VCHARS="\u00bd\u2153\u2154\u00bc\u00be\u2155\u2156\u2157\u2158\u2159\u215a\u215b\u215c\u215d\u215e";
+function niceNum(n){
+  const r=Math.round(n*1000)/1000;
+  if(Math.abs(r-Math.round(r))<1e-9) return String(Math.round(r));
+  const whole=Math.floor(r+1e-9), frac=r-whole;
+  const map=[[.5,"\u00bd"],[1/3,"\u2153"],[2/3,"\u2154"],[.25,"\u00bc"],[.75,"\u00be"],[.2,"\u2155"],[.125,"\u215b"],[.375,"\u215c"],[.625,"\u215d"],[.875,"\u215e"],[1/6,"\u2159"]];
+  for(const [v,g] of map) if(Math.abs(frac-v)<0.02) return (whole?whole+" ":"")+g;
+  return String(Math.round(r*100)/100);
+}
+const SCALE_RE=new RegExp("(\\d+)\\s+(\\d+)\\/(\\d+)|(\\d+)\\s*(["+VCHARS+"])|(["+VCHARS+"])|(\\d+)\\/(\\d+)|(\\d+(?:\\.\\d+)?)","g");
+function scaleLine(line,mult){
+  if(mult===1) return line;
+  return line.replace(SCALE_RE,(m,w1,n,d,w2,vg,vonly,fn,fd,dec)=>{
+    let val;
+    if(w1!==undefined) val=+w1+(+n)/(+d);
+    else if(w2!==undefined) val=+w2+VULGAR[vg];
+    else if(vonly!==undefined) val=VULGAR[vonly];
+    else if(fn!==undefined) val=(+fn)/(+fd);
+    else val=parseFloat(dec);
+    return niceNum(val*mult);
+  });
+}
 
 /* ---------- icons ---------- */
 const I = {
@@ -449,7 +534,12 @@ const I = {
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
   star:'<path d="m12 3 2.6 5.6 6 .8-4.4 4.2 1.1 6.1L12 16.8 6.7 19.7l1.1-6.1L3.4 9.4l6-.8L12 3Z"/>',
   cart:'<circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12h11L21 7H6"/>',
-  timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>'
+  timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>',
+  history:'<path d="M3.5 9a9 9 0 1 1-1 5"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/>',
+  logadd:'<path d="M20 6 9 17l-5-5"/>',
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+  chef:'<path d="M7 21h10M6 18h12v-3H6v3Z"/><path d="M8 15V9a4 4 0 0 1 .6-2.1A3 3 0 0 1 14 6a3 3 0 0 1 2 5.2V15"/>',
+  expand:'<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/>'
 };
 const ic = (n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
 
@@ -458,9 +548,12 @@ const SECTIONS = [
   {id:'buy',   label:'Buy',   icon:'bag',  hue:38,  acc:'#FFB03A', wheel:false, title:'Things to<br><span>buy</span>',        eyebrow:'Shopping list', sub:'Stuff you keep meaning to order, split by country and store.', spin:''},
   {id:'eat',   label:'Eat',   icon:'fork', hue:345, acc:'#FF5C7A', title:'Places to<br><span>eat</span>',        eyebrow:'Restaurants',   sub:'Where to go, what to order, and the dishes worth repeating.', spin:'Pick a place'},
   {id:'cook',  label:'Cook',  icon:'pot',  hue:172, acc:'#4ECDC4', title:'Things to<br><span>cook</span>',       eyebrow:'Recipe book',   sub:'Your own recipes, written the way you actually cook them.', spin:'Pick a recipe'},
-  {id:'watch', label:'Watch', icon:'play', hue:262, acc:'#A78BFA', title:'Things to<br><span>watch</span>',      eyebrow:'Watchlist',     sub:'Everything saved across streaming, in one list.', spin:'Pick something to watch'}
+  {id:'watch', label:'Watch', icon:'play', hue:262, acc:'#A78BFA', title:'Things to<br><span>watch</span>',      eyebrow:'Watchlist',     sub:'Everything saved across streaming, in one list.', spin:'Pick something to watch'},
+  {id:'log',   label:'Log',   icon:'history', hue:212, acc:'#5B9EF3', wheel:false, title:'What you<br><span>picked</span>',       eyebrow:'History',       sub:'Every pick the wheel made, plus anything you marked done.', spin:''}
 ];
 const SEC = Object.fromEntries(SECTIONS.map(s=>[s.id,s]));
+const VERB = {buy:'Bought', eat:'Ate', cook:'Cooked', watch:'Watched'};
+const DID  = {buy:'Bought it', eat:'Ate this', cook:'Cooked this', watch:'Watched it'};
 
 /* ---------- starter data ---------- */
 const seed = ()=>({
@@ -482,6 +575,7 @@ const seed = ()=>({
     {id:uid(),name:'India',code:'IN',places:[]}
   ]},
   cook:{recipes:[]},
+  log:[],
   watch:{platforms:[
     {id:uid(),name:'Netflix',titles:[]},
     {id:uid(),name:'Prime Video',titles:[]},
@@ -508,6 +602,18 @@ function save(){
   saveTimer = setTimeout(()=>{ persist(); schedulePush(); }, 120);
 }
 load();
+function logPush(sec,name,where,source,replaceId){
+  DB.log ||= [];
+  if(replaceId){
+    const e = DB.log.find(x=>x.id===replaceId);
+    if(e){ Object.assign(e,{name,where,source,ts:Date.now()}); DB.log = [e,...DB.log.filter(x=>x!==e)]; save(); return e; }
+  }
+  const e = {id:uid(), ts:Date.now(), sec, name, where:where||'', source};
+  DB.log.unshift(e);
+  if(DB.log.length>600) DB.log.length=600;
+  save(); return e;
+}
+function logManual(sec,name,where){ logPush(sec,name,where,'manual'); toast((VERB[sec]||'Logged')+' · '+name); }
 const countAll = db => {
   try{
     return db.buy.countries.reduce((a,c)=>a+c.stores.reduce((b,x)=>b+x.items.length,0),0)
@@ -614,6 +720,7 @@ function row({id, name, note, url, done, acts='edit,del', check=true}){
     </span>
     <span class="r-acts">
       ${url?`<a class="mini link" href="${esc(safeUrl(url))}" target="_blank" rel="noopener" title="Open link">${ic('link')}</a>`:''}
+      ${a.includes('log')?`<button class="mini logbtn" data-act="log" title="${esc(DID[state.sec]||'Log it')}">${ic('logadd')}</button>`:''}
       ${a.includes('edit')?`<button class="mini" data-act="edit" title="Edit">${ic('pen')}</button>`:''}
       ${a.includes('del')?`<button class="mini" data-act="del" title="Delete">${ic('trash')}</button>`:''}
     </span>
@@ -636,7 +743,7 @@ function renderBuy(){
       const items = s.items.filter(i=>hit(i.name+' '+(i.note||'')));
       if(state.q && !items.length && !hit(s.name)) return '';
       const left = s.items.filter(i=>!i.done).length;
-      const body = (items.length ? items.map(i=>row({id:i.id,name:i.name,note:i.note,url:i.url,done:i.done})).join('')
+      const body = (items.length ? items.map(i=>row({id:i.id,name:i.name,note:i.note,url:i.url,done:i.done,acts:'log,edit,del'})).join('')
                     : `<p class="r-note" style="padding:12px 10px">Nothing here yet.</p>`)
                  + qadd('add-item','Add an item and press Enter');
       return group({id:s.id, title:s.name, badge:left||'0', meta:s.items.length?`${s.items.length} saved`:'', body, open:isOpen(s.id, !!state.q||left>0)});
@@ -656,7 +763,7 @@ function renderEat(){
     const places = c.places.filter(p=>hit(p.name) || (p.dishes||[]).some(x=>hit(x.name)));
     const list = places.map(p=>{
       const dishes = (p.dishes||[]).filter(x=>hit(x.name)||hit(p.name));
-      const body = (dishes.length ? dishes.map(x=>row({id:x.id,name:x.name,note:x.note,url:'',done:false,check:false})).join('')
+      const body = (dishes.length ? dishes.map(x=>row({id:x.id,name:x.name,note:x.note,url:'',done:false,check:false,acts:'log,edit,del'})).join('')
                     : `<p class="r-note" style="padding:12px 10px">No dishes saved yet — add the ones you always want.</p>`)
         + qadd('add-dish','Add a dish and press Enter')
         + `<div style="display:flex;gap:8px;padding:10px 8px 2px;flex-wrap:wrap">
@@ -703,7 +810,7 @@ function renderWatch(){
     const titles = (p.titles||[]).filter(t=>hit(t.name+' '+(t.note||'')));
     if(state.q && !titles.length && !hit(p.name)) return '';
     const left = (p.titles||[]).filter(t=>!t.done).length;
-    const body = (titles.length ? titles.map(t=>row({id:t.id,name:t.name,note:t.note,url:t.url,done:t.done})).join('')
+    const body = (titles.length ? titles.map(t=>row({id:t.id,name:t.name,note:t.note,url:t.url,done:t.done,acts:'log,edit,del'})).join('')
                   : `<p class="r-note" style="padding:12px 10px">Nothing saved on ${esc(p.name)} yet.</p>`)
       + qadd('add-title','Add a show or movie and press Enter')
       + `<div style="padding:10px 8px 2px"><button class="btn ghost danger" data-act="del-platform">${ic('trash')} Remove ${esc(p.name)}</button></div>`;
@@ -714,9 +821,55 @@ function renderWatch(){
     + `<div style="margin:18px 0 0"><button class="btn dash" data-act="add-platform">${ic('plus')} Add a streaming service</button></div>`;
 }
 
+function fmtDay(ts){
+  const d=new Date(ts), now=new Date();
+  const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const diff=Math.round((t0-day)/86400000);
+  if(diff===0) return 'Today';
+  if(diff===1) return 'Yesterday';
+  if(diff<7) return d.toLocaleDateString(undefined,{weekday:'long'});
+  return d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+}
+const fmtTime = ts => new Date(ts).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+
+function renderLog(){
+  const log = (DB.log||[]).filter(e=>hit(e.name+' '+(e.where||'')+' '+(SEC[e.sec]?.label||'')));
+  const segs = `<div class="seg">
+      <button data-lf="" aria-pressed="${!state.filter.lf}">All</button>
+      ${SECTIONS.filter(x=>VERB[x.id]).map(x=>`<button data-lf="${x.id}" aria-pressed="${state.filter.lf===x.id}" style="--sec:${x.acc}">${x.label}</button>`).join('')}
+    </div>`;
+  const shown = state.filter.lf ? log.filter(e=>e.sec===state.filter.lf) : log;
+  let html = toolbar('Search your history…', segs);
+  if(!shown.length){
+    return html + empty(state.q||state.filter.lf ? 'Nothing here' : 'No history yet',
+      state.q||state.filter.lf ? 'Try a different search or filter.'
+      : 'Spin a wheel, or tap the ✓ on anything you\'ve done. It shows up here.', '');
+  }
+  // group by day
+  const groups=[]; let cur=null;
+  shown.forEach(e=>{ const key=fmtDay(e.ts); if(!cur||cur.key!==key){cur={key,items:[]};groups.push(cur);} cur.items.push(e); });
+  html += `<div class="logwrap">` + groups.map(g=>`
+    <div class="logday"><span>${esc(g.key)}</span><span class="rule"></span></div>
+    ${g.items.map(e=>{
+      const sec=SEC[e.sec]||{acc:'var(--tx-2)',icon:'spark'};
+      return `<div class="logrow" data-logid="${e.id}">
+        <span class="logic" style="--sec:${sec.acc}">${ic(sec.icon)}</span>
+        <span class="logmain">
+          <span class="logname">${esc(e.name)}</span>
+          <span class="logmeta">${esc(VERB[e.sec]||'Logged')}${e.where?' · '+esc(e.where):''}</span>
+        </span>
+        <span class="logtime">${e.source==='wheel'?`<span class="wtag" title="Chosen by the wheel">${ic('spark')}</span>`:''}${fmtTime(e.ts)}</span>
+        <button class="mini" data-act="del-log" title="Remove">${ic('trash')}</button>
+      </div>`;
+    }).join('')}`).join('');
+  html += `</div><div style="margin:20px 0 0"><button class="btn ghost danger" data-act="clear-log">${ic('trash')} Clear history</button></div>`;
+  return html;
+}
+
 function render(){
   renderNav(); renderHeader();
-  const map = {buy:renderBuy, eat:renderEat, cook:renderCook, watch:renderWatch};
+  const map = {buy:renderBuy, eat:renderEat, cook:renderCook, watch:renderWatch, log:renderLog};
   $('#app').innerHTML = map[state.sec]();
   $$('#app .group').forEach(g=>g.addEventListener('toggle',()=>{ state.open[g.dataset.g]=g.open;
     try{sessionStorage.setItem('pickone.open',JSON.stringify(state.open))}catch(e){} }));
@@ -787,28 +940,72 @@ function openForm({title,hint,fields,submitLabel='Save',onSave}){
 /* =========================================================================
    RECIPE READER
    ========================================================================= */
+const MULTS=[[.5,'\u00bd\u00d7'],[1,'1\u00d7'],[2,'2\u00d7'],[3,'3\u00d7']];
 function openRecipe(r){
   const dlg = $('#readDlg'), sheet = $('#readSheet');
   const ings = (r.ingredients||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const steps = (r.steps||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  let mult = 1;
+  const paintIngs = ()=>{
+    const box = sheet.querySelector('#ingList'); if(!box) return;
+    box.querySelectorAll('.ing .txt').forEach((el,i)=>{ el.textContent = scaleLine(ings[i], mult); });
+    sheet.querySelectorAll('[data-mult]').forEach(b=>b.setAttribute('aria-pressed', (+b.dataset.mult)===mult));
+  };
   sheet.innerHTML = `
     <button class="mini x" data-close>${ic('x')}</button>
     <h2>${esc(r.title)}</h2>
     <p class="hint">${r.time?esc(r.time)+' · ':''}${(r.tags||[]).join(' · ')||'No tags yet'}</p>
-    ${ings.length?`<div class="sec-lbl">Ingredients</div>
-      ${ings.map((x,i)=>`<button class="ing" aria-pressed="false"><span class="box"></span><span class="txt">${esc(x)}</span></button>`).join('')}`:''}
-    ${steps.length?`<div class="sec-lbl">Method</div>
+    ${ings.length?`<div class="sec-lbl">Ingredients
+        <span class="mult-seg">${MULTS.map(([v,l])=>`<button data-mult="${v}" aria-pressed="${v===1}">${l}</button>`).join('')}</span>
+      </div>
+      <div id="ingList">${ings.map(x=>`<button class="ing" aria-pressed="false"><span class="box"></span><span class="txt">${esc(x)}</span></button>`).join('')}</div>`:''}
+    ${steps.length?`<div class="sec-lbl">Method
+        <button class="cookmode-link" data-cookmode>${ic('expand')} Cooking mode</button></div>
       ${steps.map((x,i)=>`<button class="step" aria-pressed="false"><span class="n">${i+1}</span><span class="txt">${esc(x)}</span></button>`).join('')}`:''}
     ${!ings.length&&!steps.length?`<p class="hint" style="margin-top:20px">This recipe is empty. Add the ingredients and method.</p>`:''}
     <div class="sheet-foot">
+      <button class="btn primary" data-cooked>${ic('logadd')} Cooked this</button>
       <button class="btn" data-edit>${ic('pen')} Edit</button>
       <button class="btn ghost danger" data-del>${ic('trash')} Delete</button>
     </div>`;
   sheet.querySelectorAll('.ing,.step').forEach(b=>b.onclick=()=>b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')!=='true'));
+  sheet.querySelectorAll('[data-mult]').forEach(b=>b.onclick=()=>{ mult=+b.dataset.mult; paintIngs(); });
   sheet.querySelector('[data-close]').onclick = ()=>dlg.close();
   sheet.querySelector('[data-edit]').onclick = ()=>{ dlg.close(); editRecipe(r); };
+  sheet.querySelector('[data-cooked]').onclick = ()=>{ logManual('cook', r.title, (r.tags||[]).join(' \u00b7 ')); dlg.close(); };
   sheet.querySelector('[data-del]').onclick = ()=>{ dlg.close(); removeFrom(DB.cook.recipes, r, r.title); };
+  sheet.querySelector('[data-cookmode]')?.addEventListener('click', ()=>openCookMode(r, ()=>mult, ings, steps));
   dlg.showModal();
+}
+
+/* ---------- cooking mode: big text, screen stays awake ---------- */
+let wakeLock=null;
+async function acquireWake(){
+  try{ if('wakeLock' in navigator){ wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener?.('release',()=>{}); } }catch(e){}
+}
+function releaseWake(){ try{ wakeLock?.release?.(); }catch(e){} wakeLock=null; }
+function openCookMode(r, getMult, ings, steps){
+  const dlg = $('#cookDlg'), box = $('#cookSheet');
+  const mult = getMult();
+  box.innerHTML = `
+    <div class="cook-top">
+      <div class="cook-title">${esc(r.title)}</div>
+      <button class="mini" data-close title="Exit">${ic('x')}</button>
+    </div>
+    <div class="cook-scroll">
+      ${ings.length?`<div class="cook-h">Ingredients${mult!==1?` <span>(${MULTS.find(m=>m[0]===mult)?.[1]||mult+'\u00d7'})</span>`:''}</div>
+        <ul class="cook-ings">${ings.map(x=>`<li>${esc(scaleLine(x,mult))}</li>`).join('')}</ul>`:''}
+      <div class="cook-h">Method</div>
+      <ol class="cook-steps">${steps.map(x=>`<li><button class="cs" aria-pressed="false"><span class="txt">${esc(x)}</span></button></li>`).join('')}</ol>
+      <button class="btn primary wide" data-cooked-cm style="margin-top:8px">${ic('logadd')} Cooked this</button>
+    </div>
+    <div class="cook-foot"><span class="wake-note">${'wakeLock' in navigator?'Screen stays on while you cook':''}</span></div>`;
+  box.querySelectorAll('.cs').forEach(b=>b.onclick=()=>b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')!=='true'));
+  box.querySelector('[data-close]').onclick = ()=>dlg.close();
+  box.querySelector('[data-cooked-cm]').onclick = ()=>{ logManual('cook', r.title, (r.tags||[]).join(' \u00b7 ')); dlg.close(); };
+  dlg.showModal(); acquireWake();
+  dlg.addEventListener('close', releaseWake, {once:true});
 }
 function editRecipe(r){
   const isNew = !r;
@@ -902,7 +1099,7 @@ function renderWheel(){
         <p>Add a few things to this section first, then come back.</p></div>`}`;
 
   sheet.querySelector('[data-close]').onclick = ()=>$('#wheelDlg').close();
-  sheet.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{ W.src=+b.dataset.src; W.out.clear(); W.angle=0; renderWheel(); });
+  sheet.querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{ W.src=+b.dataset.src; W.out.clear(); W.angle=0; W.logId=null; renderWheel(); });
   sheet.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{
     const id=b.dataset.chip; W.out.has(id)?W.out.delete(id):W.out.add(id);
     if(!candidates().length) W.out.delete(id);
@@ -949,6 +1146,7 @@ function spin(){
     W.busy = false; W.angle = target % 360;
     const it = cand[win];
     btn.disabled = false; btn.textContent = 'Spin again';
+    const entry = logPush(state.sec, it.name, it.where, 'wheel', W.logId); W.logId = entry.id;
     const extra = [];
     if(it.url) extra.push(`<a class="btn primary" href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener">${ic('link')} Open</a>`);
     if(it.recipe) extra.push(`<button class="btn primary" data-open-recipe>${ic('pot')} Open recipe</button>`);
@@ -968,7 +1166,7 @@ function spin(){
     });
   }, reduce?320:4450);
 }
-function openWheel(){ if(SEC[state.sec].wheel===false) return; W.out.clear(); W.angle=0; W.src=0; renderWheel(); $('#wheelDlg').showModal(); }
+function openWheel(){ if(SEC[state.sec].wheel===false) return; W.out.clear(); W.angle=0; W.src=0; W.logId=null; renderWheel(); $('#wheelDlg').showModal(); }
 
 /* =========================================================================
    SETTINGS / BACKUP
@@ -979,7 +1177,8 @@ function openSettings(){
     buy: DB.buy.countries.reduce((a,c)=>a+c.stores.reduce((b,s)=>b+s.items.length,0),0),
     eat: DB.eat.countries.reduce((a,c)=>a+c.places.length,0),
     cook: DB.cook.recipes.length,
-    watch: DB.watch.platforms.reduce((a,p)=>a+(p.titles||[]).length,0)
+    watch: DB.watch.platforms.reduce((a,p)=>a+(p.titles||[]).length,0),
+    log: (DB.log||[]).length
   };
   sheet.innerHTML = `
     <button class="mini x" data-close>${ic('x')}</button>
@@ -1180,7 +1379,7 @@ function paintSyncBlock(){
 
 /* keep every device fresh */
 setInterval(()=>syncPull(true), 60000);
-document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) syncPull(true); });
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ syncPull(true); if($('#cookDlg')?.open) acquireWake(); } });
 window.addEventListener('focus', ()=>syncPull(true));
 window.addEventListener('online', ()=>syncPull(true));
 
@@ -1207,6 +1406,9 @@ document.addEventListener('click', e=>{
   const tagBtn = e.target.closest('[data-tag]');
   if(tagBtn){ state.filter.tag = tagBtn.dataset.tag || null; render(); return; }
 
+  const lfBtn = e.target.closest('[data-lf]');
+  if(lfBtn){ state.filter.lf = lfBtn.dataset.lf || null; render(); return; }
+
   const el = e.target.closest('[data-act]'); if(!el) return;
   const act = el.dataset.act;
   const L = () => locate(el);
@@ -1214,6 +1416,27 @@ document.addEventListener('click', e=>{
   switch(act){
     case 'settings': openSettings(); break;
 
+    case 'log': {
+      const {item} = L(); if(!item) break;
+      let where='';
+      if(state.sec==='eat'){ const {pl}=L(); where=pl?pl.name:''; }
+      else if(state.sec==='buy'){ const {st}=L(); where=st?st.name:''; }
+      else if(state.sec==='watch'){ const {pf}=L(); where=pf?pf.name:''; }
+      logManual(state.sec, item.name, where);
+      break;
+    }
+    case 'del-log': {
+      const id = el.closest('[data-logid]')?.dataset.logid;
+      const i = DB.log.findIndex(x=>x.id===id); if(i<0) break;
+      const [e2]=DB.log.splice(i,1); save(); render();
+      toast('Removed from history', ()=>DB.log.splice(i,0,e2));
+      break;
+    }
+    case 'clear-log': {
+      const old = DB.log; DB.log=[]; save(); render();
+      toast('History cleared', ()=>{ DB.log=old; });
+      break;
+    }
     case 'toggle': {
       const {item} = L(); if(!item) break;
       item.done = !item.done; save();
@@ -1305,8 +1528,8 @@ $('#spinBtn').addEventListener('click', openWheel);
 document.addEventListener('keydown', e=>{
   if(!e.target || !e.target.matches || e.target.matches('input,textarea,select')) return;
   if($$('dialog').some(d=>d.open)) return;
-  const i = ['1','2','3','4'].indexOf(e.key);
-  if(i>-1){ state.sec = SECTIONS[i].id; location.hash=state.sec; state.q=''; render(); }
+  const i = parseInt(e.key,10)-1;
+  if(i>=0 && i<SECTIONS.length){ state.sec = SECTIONS[i].id; location.hash=state.sec; state.q=''; render(); }
   else if(e.key==='/'){ e.preventDefault(); $('#q')?.focus(); }
   else if(e.key.toLowerCase()==='s'){ openWheel(); }
 });
