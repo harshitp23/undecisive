@@ -64,7 +64,7 @@ a{color:inherit}
 /* ---------- side rail (desktop) ---------- */
 .rail{
   display:none; width:var(--rail); flex-direction:column; align-items:center; gap:6px;
-  padding:18px 0; border-right:1px solid var(--line); background:var(--bg-2);
+  padding:calc(18px + env(safe-area-inset-top)) 0 18px; border-right:1px solid var(--line); background:var(--bg-2);
   position:sticky; top:0; height:100dvh;
 }
 .mark{width:34px;height:34px;margin-bottom:14px;flex:none}
@@ -89,7 +89,7 @@ a{color:inherit}
 .icon-btn svg{width:19px;height:19px;stroke-width:1.8}
 
 /* ---------- header ---------- */
-.top{padding:26px 0 14px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.top{padding:calc(26px + env(safe-area-inset-top)) 0 14px;display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
 .eyebrow{
   font:700 10.5px/1 var(--font-m);letter-spacing:.18em;text-transform:uppercase;
   color:var(--acc);display:flex;align-items:center;gap:8px;margin:0 0 8px
@@ -366,7 +366,7 @@ dialog::backdrop{background:color-mix(in oklab,var(--bg-2) 78%,transparent);back
 .tab[aria-current="true"] svg{transform:translateY(-1px)}
 
 @media (max-width:620px){
-  .top{padding-top:20px}
+  .top{padding-top:calc(20px + env(safe-area-inset-top))}
   .top-actions{width:100%;margin-left:0}
   .spin-cta{width:100%;justify-content:center;padding:15px 20px}
   .toolbar{gap:7px}
