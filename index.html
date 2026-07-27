@@ -6,6 +6,12 @@
 <title>Pick One</title>
 <meta name="description" content="A personal hub for things to buy, eat, cook and watch — with a wheel for when you can't decide.">
 <meta name="theme-color" content="#16151C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pick One">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -1600,6 +1606,15 @@ try{ localStorage.removeItem('pickone.theme'); }catch(e){}
 document.body.dataset.sync = SYNC.status;
 render();
 if(SYNC.token && SYNC.gist) syncPull(true);
+
+/* ---------- install as an app (PWA) ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    // relative URL so it works whether served from / or /repo/ on GitHub Pages
+    const base = location.pathname.replace(/[^/]*$/, '');
+    navigator.serviceWorker.register(base + 'sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
