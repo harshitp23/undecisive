@@ -539,7 +539,8 @@ const I = {
   logadd:'<path d="M20 6 9 17l-5-5"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
   chef:'<path d="M7 21h10M6 18h12v-3H6v3Z"/><path d="M8 15V9a4 4 0 0 1 .6-2.1A3 3 0 0 1 14 6a3 3 0 0 1 2 5.2V15"/>',
-  expand:'<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/>'
+  expand:'<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/>',
+  back:'<path d="M19 12H5M12 19l-7-7 7-7"/>'
 };
 const ic = (n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
 
@@ -998,12 +999,12 @@ function openCookMode(r, getMult, ings, steps){
         <ul class="cook-ings">${ings.map(x=>`<li>${esc(scaleLine(x,mult))}</li>`).join('')}</ul>`:''}
       <div class="cook-h">Method</div>
       <ol class="cook-steps">${steps.map(x=>`<li><button class="cs" aria-pressed="false"><span class="txt">${esc(x)}</span></button></li>`).join('')}</ol>
-      <button class="btn primary wide" data-cooked-cm style="margin-top:8px">${ic('logadd')} Cooked this</button>
+      <button class="btn wide" data-back-cm style="margin-top:8px">${ic('back')} Go back</button>
     </div>
     <div class="cook-foot"><span class="wake-note">${'wakeLock' in navigator?'Screen stays on while you cook':''}</span></div>`;
   box.querySelectorAll('.cs').forEach(b=>b.onclick=()=>b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')!=='true'));
   box.querySelector('[data-close]').onclick = ()=>dlg.close();
-  box.querySelector('[data-cooked-cm]').onclick = ()=>{ logManual('cook', r.title, (r.tags||[]).join(' \u00b7 ')); dlg.close(); };
+  box.querySelector('[data-back-cm]').onclick = ()=>dlg.close();
   dlg.showModal(); acquireWake();
   dlg.addEventListener('close', releaseWake, {once:true});
 }
