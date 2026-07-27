@@ -159,6 +159,9 @@ h1 span{color:var(--acc)}
   border:1px solid var(--acc-line);color:var(--acc)
 }
 .country .rule{flex:1;height:1px;background:var(--line)}
+.country-del{opacity:0;transition:opacity .15s var(--ease);color:var(--tx-3)}
+.country:hover .country-del,.country:focus-within .country-del{opacity:.6}
+.country-del:hover{opacity:1;color:#FF6B6B;background:var(--bg-2)}
 
 /* ---------- rows ---------- */
 .row{
@@ -187,7 +190,15 @@ h1 span{color:var(--acc)}
 .mini.logbtn:hover{color:#4ADE80}
 
 /* ---------- quick add ---------- */
-.qadd{display:flex;gap:8px;align-items:center;padding:8px 8px 4px}
+.qadd{padding:8px 8px 4px}
+.qadd-row{display:flex;gap:8px;align-items:center}
+.qadd[data-collapsed="1"] .qadd-row{display:none}
+.qadd[data-collapsed="0"] .qadd-open{display:none}
+.qadd-open{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 15px;border-radius:12px;
+  border:1px dashed var(--line-2);background:transparent;color:var(--tx-2);font-weight:600;font-size:14px;
+  transition:.15s var(--ease)}
+.qadd-open:hover{color:var(--acc);border-color:var(--acc-line);background:var(--bg-2)}
+.qadd-open svg{width:16px;height:16px;stroke-width:2}
 .qadd input{
   flex:1;height:42px;padding:0 14px;border-radius:12px;border:1px dashed var(--line-2);
   background:transparent;outline:none;font-size:14.5px
@@ -697,7 +708,8 @@ const toolbar = (placeholder, segs) => `
 
 const countryHead = (c) => `
   <div class="country"><span class="flagcode">${esc(c.code||c.name.slice(0,2).toUpperCase())}</span>
-    <h2>${esc(c.name)}</h2><span class="rule"></span></div>`;
+    <h2>${esc(c.name)}</h2><span class="rule"></span>
+    <button class="mini country-del" data-act="del-country" title="Remove ${esc(c.name)}">${ic('trash')}</button></div>`;
 
 function group({id, title, badge, meta, body, open}){
   return `<details class="group" data-g="${id}" ${open?'open':''}>
@@ -728,9 +740,12 @@ function row({id, name, note, url, done, acts='edit,del', check=true}){
   </div>`;
 }
 
-const qadd = (act, ph) => `<div class="qadd">
-  <input type="text" data-qadd="${act}" placeholder="${ph}" autocomplete="off" enterkeyhint="done">
-  <button data-act="${act}">${ic('plus')}<span class="sr">Add</span></button></div>`;
+const qadd = (act, ph) => `<div class="qadd" data-collapsed="1">
+  <button class="qadd-open" data-act="qadd-open">${ic('plus')} Add</button>
+  <div class="qadd-row">
+    <input type="text" data-qadd="${act}" placeholder="${ph}" autocomplete="off" enterkeyhint="done">
+    <button data-act="${act}">${ic('plus')}<span class="sr">Add</span></button>
+  </div></div>`;
 
 const empty = (h,p,btn) => `<div class="empty"><h3>${h}</h3><p>${p}</p>${btn||''}</div>`;
 const hit = (t) => !state.q || norm(t).includes(norm(state.q));
@@ -1397,7 +1412,7 @@ function quickAdd(input, act){
   const keep = input.closest('[data-g]')?.dataset.g;
   render();
   const next = $(`[data-g="${keep}"] [data-qadd="${act}"]`);
-  next?.focus();
+  if(next){ next.closest('.qadd').dataset.collapsed='0'; next.focus(); }
 }
 
 document.addEventListener('click', e=>{
@@ -1446,6 +1461,10 @@ document.addEventListener('click', e=>{
       const list = state.sec==='buy' ? L().st.items : L().pf.titles;
       if(badge) badge.textContent = list.filter(i=>!i.done).length || '0';
       break;
+    }
+    case 'qadd-open': {
+      const box = el.closest('.qadd'); box.dataset.collapsed='0';
+      box.querySelector('input').focus(); break;
     }
     case 'add-item': case 'add-dish': case 'add-title':
       quickAdd(el.closest('.qadd').querySelector('input'), act); break;
@@ -1497,6 +1516,30 @@ document.addEventListener('click', e=>{
         submitLabel:'Add service', onSave(v){ DB.watch.platforms.push({id:uid(),name:v.name,titles:[]}); }});
       break;
     case 'del-platform': { const {pf}=L(); removeFrom(DB.watch.platforms,pf,pf.name); break; }
+    case 'del-country': {
+      const list = state.sec==='buy' ? DB.buy.countries : DB.eat.countries;
+      const c = findCountry(list, ctx(el).c); if(!c) break;
+      const contents = state.sec==='buy'
+        ? c.stores.reduce((a,s2)=>a+s2.items.length,0)
+        : (c.places||[]).length;
+      const doDel = ()=>{
+        const i = list.indexOf(c); if(i<0) return;
+        list.splice(i,1); save(); render();
+        toast(`${c.name} removed`, ()=>list.splice(i,0,c));
+      };
+      if(contents>0){
+        openForm({
+          title:`Remove ${c.name}?`,
+          hint: state.sec==='buy'
+            ? `This deletes ${c.stores.length} store${c.stores.length!==1?'s':''} and ${contents} item${contents!==1?'s':''} inside it.`
+            : `This deletes ${contents} place${contents!==1?'s':''} saved in it.`,
+          fields:[{k:'confirm',label:`Type the country name to confirm`,ph:c.name}],
+          submitLabel:'Remove country',
+          onSave(v){ if(v.confirm.trim().toLowerCase()===c.name.toLowerCase()) doDel(); else toast('Name did not match — nothing removed'); }
+        });
+      } else doDel();
+      break;
+    }
     case 'add-country': {
       const list = state.sec==='buy' ? DB.buy.countries : DB.eat.countries;
       openForm({title:'New country', fields:[
@@ -1517,6 +1560,21 @@ document.addEventListener('keydown', e=>{
   if(qa && e.key==='Enter'){ e.preventDefault(); quickAdd(qa, qa.dataset.qadd); }
 });
 
+document.addEventListener('focusout', e=>{
+  const box = e.target.closest && e.target.closest('.qadd');
+  if(!box) return;
+  // where is focus heading? if it's still inside this box (e.g. the Add button), keep it open
+  const to = e.relatedTarget;
+  if(to && box.contains(to)) return;
+  setTimeout(()=>{
+    if(box.contains(document.activeElement)) return;
+    if(!box.querySelector('input').value.trim()) box.dataset.collapsed='1';
+  }, 100);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ const box=e.target.closest && e.target.closest('.qadd');
+    if(box){ box.querySelector('input').value=''; box.dataset.collapsed='1'; e.stopPropagation(); } }
+}, true);
 document.addEventListener('input', e=>{
   if(e.target.id!=='q') return;
   state.q = e.target.value;
