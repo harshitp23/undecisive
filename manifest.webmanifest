@@ -1,0 +1,16 @@
+{
+  "name": "Pick One",
+  "short_name": "Pick One",
+  "description": "A personal hub for what to buy, eat, cook and watch — with a wheel for when you can't decide.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#16151C",
+  "theme_color": "#16151C",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
