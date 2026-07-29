@@ -767,7 +767,12 @@ function renderBuy(){
       const left = s.items.filter(i=>!i.done).length;
       const body = (items.length ? items.map(i=>row({id:i.id,name:i.name,note:i.note,url:i.url,done:i.done,acts:'log,edit,del'})).join('')
                     : `<p class="r-note" style="padding:12px 10px">Nothing here yet.</p>`)
-                 + qadd('add-item','Add an item and press Enter');
+                 + qadd('add-item','Add an item and press Enter')
+                 + `<div style="display:flex;gap:8px;padding:10px 8px 2px;flex-wrap:wrap">
+                      ${s.url?`<a class="btn ghost" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">${ic('link')} Open</a>`:''}
+                      <button class="btn ghost" data-act="edit-store">${ic('pen')} Edit store</button>
+                      <button class="btn ghost danger" data-act="del-store">${ic('trash')} Delete store</button>
+                    </div>`;
       return group({id:s.id, title:s.name, badge:left||'0', meta:s.items.length?`${s.items.length} saved`:'', body, open:isOpen(s.id, !!state.q||left>0)});
     }).join('');
     html += `<section data-c="${c.id}">${countryHead(c)}${stores || `<p class="r-note" style="padding:0 0 8px">No stores match.</p>`}
@@ -1488,6 +1493,30 @@ document.addEventListener('click', e=>{
     case 'del': {
       const {item,list} = L(); if(!item) break;
       removeFrom(list,item,item.name); break;
+    }
+    case 'edit-store': {
+      const {co,st} = L(); if(!st) break;
+      openForm({title:'Edit store', fields:[
+        {k:'name',label:'Store name',val:st.name},
+        {k:'url',label:'Link',val:st.url,ph:'https://…'}
+      ], onSave(v){ Object.assign(st,v); }});
+      break;
+    }
+    case 'del-store': {
+      const {co,st} = L(); if(!st) break;
+      const doDel = ()=>{ const i=co.stores.indexOf(st); if(i<0) return;
+        co.stores.splice(i,1); save(); render();
+        toast(`${st.name} deleted`, ()=>co.stores.splice(i,0,st)); };
+      if(st.items.length>0){
+        openForm({
+          title:`Delete ${st.name}?`,
+          hint:`This removes ${st.items.length} item${st.items.length!==1?'s':''} saved in it.`,
+          fields:[{k:'confirm',label:'Type the store name to confirm',ph:st.name}],
+          submitLabel:'Delete store',
+          onSave(v){ if(v.confirm.trim().toLowerCase()===st.name.toLowerCase()) doDel(); else toast('Name did not match — nothing deleted'); }
+        });
+      } else doDel();
+      break;
     }
     case 'add-store': {
       const {co} = L();
